@@ -90,7 +90,6 @@ async function executeWeatherFetchPipeline() {
   let currentWeatherUrl = "";
   let forecastUrl = "";
 
-  // FIX: Added 'api.' subdomain, proper '/data/2.5/...' paths, and the missing '$' for variables.
   if (currentSearchType === "city") {
     currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${lastQueryParam}&appid=${apikey}&units=${currentUnits}`;
     forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${lastQueryParam}&appid=${apikey}&units=${currentUnits}`;
@@ -136,7 +135,6 @@ function updateCurrentUI(data) {
   document.getElementById("wind").innerText =
     `Wind Speed: ${windVal} ${windUnit}`;
 
-  // FIX: Added proper icon URL path and missing '$' interpolation
   const iconImg = document.getElementById("weatherIcon");
   iconImg.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
   iconImg.alt = formattedDescription;
@@ -162,7 +160,6 @@ function updateForecastUI(data) {
     const date = new Date(item.dt * 1000);
     const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
 
-    // FIX: Added proper icon URL path and missing '$' interpolation
     const card = document.createElement("div");
     card.className = "forecast-card";
     card.innerHTML = `
