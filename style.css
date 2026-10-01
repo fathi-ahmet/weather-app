@@ -147,6 +147,61 @@ input:checked + .slider:before {
   outline: none;
 }
 
+.weather-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+#favoriteBtn {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #dfe6e9;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #2d3436;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+#favoriteBtn:hover:not(:disabled),
+#favoriteBtn.active {
+  background: #fff3cd;
+  border-color: #f4c95d;
+  color: #7a5800;
+}
+
+#favoriteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.favorites-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 0 0 18px;
+}
+
+.favorite-item {
+  padding: 7px 10px;
+  border: 1px solid #dfe6e9;
+  border-radius: 999px;
+  background: #fff;
+  color: #2d3436;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.favorite-item:hover,
+.favorite-item:focus-visible {
+  background: #eaf4ff;
+  border-color: #74b9ff;
+  outline: none;
+}
+
 input[type="text"],
 #cityInput {
   width: 70%;
