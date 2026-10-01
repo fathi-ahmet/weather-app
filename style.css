@@ -234,6 +234,24 @@ button:hover:not(:disabled) {
   font-weight: 600;
 }
 
+.weather-result.empty-state {
+  border: 1px dashed #dfe6e9;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.8);
+  padding: 20px 16px;
+}
+
+.forecast-empty {
+  margin-top: 20px;
+  padding: 16px 12px;
+  border: 1px dashed #dfe6e9;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.8);
+  color: #636e72;
+  font-size: 14px;
+  text-align: center;
+}
+
 .status-message.info {
   display: block;
   background: #eaf4ff;
