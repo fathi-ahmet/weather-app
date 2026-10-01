@@ -227,7 +227,7 @@ h1 {
 .switch {
   position: relative;
   display: inline-block;
-  width: 50px;
+  width: 46px;
   height: 24px;
 }
 
@@ -239,34 +239,36 @@ h1 {
 
 .slider {
   position: absolute;
+  inset: 0;
+  background: transparent;
+  border-radius: 999px;
+  transition: 0.3s ease;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-  border-radius: 24px;
 }
 
 .slider:before {
   position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: 0.4s;
+  content: "°C";
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  color: #2d3436;
+  background: transparent;
   border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: #6c5ce7;
+  transition: 0.3s ease;
 }
 
 input:checked + .slider:before {
-  transform: translateX(26px);
+  content: "°F";
+  left: 22px;
+  color: #f8fafc;
 }
 
 .input-group {
