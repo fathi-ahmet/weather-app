@@ -5,6 +5,10 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   display: flex;
   justify-content: center;
@@ -13,6 +17,23 @@ body {
   background: linear-gradient(135deg, #74b9ff, #a29bfe);
   transition: background 0.5s ease;
   padding: 20px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 body.hot {
@@ -121,6 +142,7 @@ input:focus {
 
 #searchBtn {
   width: 30%;
+  min-width: 92px;
   padding: 12px;
   background: #74b9ff;
   color: white;
@@ -129,11 +151,21 @@ input:focus {
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  transition: background 0.3s;
+  transition:
+    background 0.3s,
+    transform 0.2s ease;
 }
 
 #searchBtn:hover:not(:disabled) {
   background: #0984e3;
+}
+
+#searchBtn:focus-visible,
+#locationBtn:focus-visible,
+#cityInput:focus-visible,
+.switch:focus-within {
+  outline: 3px solid rgba(21, 101, 192, 0.45);
+  outline-offset: 3px;
 }
 
 #searchBtn:disabled,
@@ -144,6 +176,7 @@ input:focus {
 
 #locationBtn {
   width: 100%;
+  min-height: 48px;
   padding: 10px;
   background: #6c5ce7;
   color: white;
@@ -153,11 +186,17 @@ input:focus {
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 20px;
-  transition: background 0.3s;
+  transition:
+    background 0.3s,
+    transform 0.2s ease;
 }
 
 #locationBtn:hover:not(:disabled) {
   background: #5b4cc4;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .status-message {
@@ -278,7 +317,41 @@ p {
 }
 
 @media (max-width: 600px) {
+  .container {
+    padding: 22px 18px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #cityInput,
+  #searchBtn {
+    width: 100%;
+    border-radius: 25px;
+  }
+
+  #searchBtn {
+    min-height: 48px;
+  }
+
+  #forecastContainer {
+    margin-top: 16px;
+  }
+
   .forecast-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
