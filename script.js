@@ -200,25 +200,69 @@ function updateForecastUI(data) {
   const container = document.getElementById("forecastContainer");
   container.innerHTML = "";
 
-  const targetIndexes = [7, 15, 23]; // Roughly 24h, 48h, and 72h out
   const tempUnit = currentUnits === "metric" ? "°C" : "°F";
+  const dailyMap = new Map();
 
-  targetIndexes.forEach(index => {
-    const item = data.list[index];
-    if (!item) return;
-
+  data.list.forEach(item => {
     const date = new Date(item.dt * 1000);
-    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+    const dayKey = date.toDateString();
 
+    if (!dailyMap.has(dayKey)) {
+      dailyMap.set(dayKey, {
+        date,
+        tempMin: item.main.temp,
+        tempMax: item.main.temp,
+        humidity: item.main.humidity,
+        condition: item.weather[0].description,
+        icon: item.weather[0].icon,
+      });
+      return;
+    }
+
+    const dayData = dailyMap.get(dayKey);
+    dayData.tempMin = Math.min(dayData.tempMin, item.main.temp);
+    dayData.tempMax = Math.max(dayData.tempMax, item.main.temp);
+    dayData.humidity = Math.round((dayData.humidity + item.main.humidity) / 2);
+    dayData.condition = item.weather[0].description;
+    dayData.icon = item.weather[0].icon;
+  });
+
+  const dailyEntries = Array.from(dailyMap.values()).slice(0, 5);
+
+  const title = document.createElement("h3");
+  title.className = "forecast-title";
+  title.textContent = "5-Day Forecast";
+  container.appendChild(title);
+
+  const grid = document.createElement("div");
+  grid.className = "forecast-grid";
+
+  dailyEntries.forEach(day => {
     const card = document.createElement("div");
     card.className = "forecast-card";
+
+    const dayName = day.date.toLocaleDateString("en-US", { weekday: "short" });
+    const dateLabel = day.date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+    const tempLow = Math.round(day.tempMin);
+    const tempHigh = Math.round(day.tempMax);
+    const description = capitalizeWords(day.condition);
+
     card.innerHTML = `
       <h4>${dayName}</h4>
-      <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="icon" />
-      <p>${Math.round(item.main.temp)}${tempUnit}</p>
+      <p class="forecast-date">${dateLabel}</p>
+      <img src="https://openweathermap.org/img/wn/${day.icon}.png" alt="${description}" />
+      <p class="forecast-range">${tempLow}${tempUnit} / ${tempHigh}${tempUnit}</p>
+      <p class="forecast-condition">${description}</p>
+      <p class="forecast-humidity">Humidity: ${day.humidity}%</p>
     `;
-    container.appendChild(card);
+
+    grid.appendChild(card);
   });
+
+  container.appendChild(grid);
 }
 
 function capitalizeWords(str) {
