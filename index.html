@@ -51,6 +51,12 @@
 
       <div id="statusMessage" class="status-message" aria-live="polite"></div>
 
+      <div class="weather-actions">
+        <button id="favoriteBtn" type="button" aria-pressed="false">
+          ☆ Save City
+        </button>
+      </div>
+
       <div
         id="weatherResult"
         class="weather-result empty-state"
@@ -63,6 +69,12 @@
         <p id="humidity"></p>
         <p id="wind"></p>
       </div>
+
+      <div
+        id="favoritesContainer"
+        class="favorites-container"
+        aria-live="polite"
+      ></div>
 
       <div id="forecastContainer" class="forecast-empty" aria-live="polite">
         Forecast will appear here after a successful search.
