@@ -206,6 +206,12 @@ function applyTheme(theme) {
   localStorage.setItem("weatherTheme", theme);
 }
 
+function applyWeatherBackground(tempCelsius) {
+  const isHot = tempCelsius >= 20;
+  document.body.classList.toggle("hot", isHot);
+  document.body.classList.toggle("cold", !isHot);
+}
+
 function handleCitySearch(forceCity) {
   const city = normalizeCityQuery(forceCity || cityInput.value);
   if (!city) {
@@ -475,7 +481,7 @@ function updateCurrentUI(data) {
   // Use Celsius equivalent for the theme switcher breakpoint (20°C)
   const celsiusTemp =
     currentUnits === "metric" ? tempVal : ((tempVal - 32) * 5) / 9;
-  document.body.className = celsiusTemp >= 20 ? "hot" : "cold";
+  applyWeatherBackground(celsiusTemp);
   updateFavoriteButtonState();
 }
 
