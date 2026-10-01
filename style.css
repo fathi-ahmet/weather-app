@@ -110,6 +110,11 @@ input[type="text"],
   font-size: 16px;
 }
 
+#cityInput:disabled {
+  background: #f5f7fa;
+  cursor: not-allowed;
+}
+
 input:focus {
   border-color: #74b9ff;
 }
