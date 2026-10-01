@@ -8,17 +8,21 @@
     <div class="container">
       <h1>Weather App</h1>
 
-      <!-- Toggle Switch -->
-      <div class="toggle-container">
-        <span>°C</span>
-        <label class="switch">
-          <input type="checkbox" id="unitToggle" />
+      <div class="toggle-container" aria-label="Temperature units">
+        <span aria-hidden="true">°C</span>
+        <label class="switch" for="unitToggle">
+          <input
+            type="checkbox"
+            id="unitToggle"
+            aria-label="Toggle between Celsius and Fahrenheit"
+          />
           <span class="slider"></span>
         </label>
-        <span>°F</span>
+        <span aria-hidden="true">°F</span>
       </div>
 
       <div class="input-group">
+        <label class="sr-only" for="cityInput">City name</label>
         <input
           id="cityInput"
           type="search"
@@ -26,10 +30,18 @@
           autocomplete="off"
           placeholder="Enter city name"
         />
-        <button id="searchBtn" type="button">Search</button>
+        <button
+          id="searchBtn"
+          type="button"
+          aria-label="Search weather for city"
+        >
+          Search
+        </button>
       </div>
 
-      <button id="locationBtn">Use Current Location</button>
+      <button id="locationBtn" type="button" aria-label="Use current location">
+        Use Current Location
+      </button>
 
       <div id="statusMessage" class="status-message" aria-live="polite"></div>
 
