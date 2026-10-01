@@ -51,17 +51,22 @@
 
       <div id="statusMessage" class="status-message" aria-live="polite"></div>
 
-      <div id="weatherResult">
-        <h2 id="city"></h2>
+      <div
+        id="weatherResult"
+        class="weather-result empty-state"
+        aria-live="polite"
+      >
+        <h2 id="city">No city selected</h2>
         <img id="weatherIcon" src="" alt="" style="display: none" />
-        <p id="temp"></p>
+        <p id="temp">Search for a city to see the weather.</p>
         <p id="condition"></p>
         <p id="humidity"></p>
         <p id="wind"></p>
       </div>
 
-      <!-- 3-Day Forecast Container -->
-      <div id="forecastContainer"></div>
+      <div id="forecastContainer" class="forecast-empty" aria-live="polite">
+        Forecast will appear here after a successful search.
+      </div>
     </div>
     <script src="config.js"></script>
     <script src="script.js"></script>
