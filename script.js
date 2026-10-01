@@ -4,6 +4,20 @@ const locationBtn = document.getElementById("locationBtn");
 const cityInput = document.getElementById("cityInput");
 const unitToggle = document.getElementById("unitToggle");
 const statusMessage = document.getElementById("statusMessage");
+const searchSuggestions = document.getElementById("searchSuggestions");
+
+const popularCities = [
+  "London",
+  "New York",
+  "Tokyo",
+  "Paris",
+  "Dubai",
+  "Sydney",
+  "Rome",
+  "Toronto",
+  "Berlin",
+  "Singapore",
+];
 
 let currentUnits = "metric";
 let currentSearchType = "city";
@@ -37,8 +51,65 @@ function getEncodedCityQuery() {
   return encodeURIComponent(normalizeCityQuery(lastQueryParam));
 }
 
-function handleCitySearch() {
-  const city = normalizeCityQuery(cityInput.value);
+function getRecentCities() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("weatherRecentCities") || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveRecentCity(city) {
+  const cleanedCity = normalizeCityQuery(city);
+  if (!cleanedCity) return;
+
+  const recent = getRecentCities();
+  const updated = [cleanedCity, ...recent.filter(item => item.toLowerCase() !== cleanedCity.toLowerCase())].slice(0, 6);
+  localStorage.setItem("weatherRecentCities", JSON.stringify(updated));
+  renderSearchSuggestions();
+}
+
+function renderSearchSuggestions() {
+  if (!searchSuggestions) return;
+
+  const query = normalizeCityQuery(cityInput.value).toLowerCase();
+  const recentCities = getRecentCities();
+  const suggestedCities = query
+    ? [...recentCities, ...popularCities]
+        .filter((city, index, array) => {
+          const normalizedCity = city.toLowerCase();
+          return normalizedCity.includes(query) && array.indexOf(city) === index;
+        })
+        .slice(0, 6)
+    : [...recentCities, ...popularCities].slice(0, 6);
+
+  if (!suggestedCities.length) {
+    searchSuggestions.innerHTML = "";
+    return;
+  }
+
+  searchSuggestions.innerHTML = suggestedCities
+    .map(
+      city => `
+        <button class="search-suggestion" type="button" data-city="${city}">
+          ${city}
+        </button>
+      `,
+    )
+    .join("");
+
+  searchSuggestions.querySelectorAll(".search-suggestion").forEach(button => {
+    button.addEventListener("click", () => {
+      const selectedCity = button.dataset.city;
+      cityInput.value = selectedCity;
+      handleCitySearch(selectedCity);
+    });
+  });
+}
+
+function handleCitySearch(forceCity) {
+  const city = normalizeCityQuery(forceCity || cityInput.value);
   if (!city) {
     setStatus("Please enter a city name first.", "error");
     cityInput.focus();
@@ -51,6 +122,7 @@ function handleCitySearch() {
 
   localStorage.setItem("weatherSearchType", "city");
   localStorage.setItem("weatherQueryParam", JSON.stringify(city));
+  saveRecentCity(city);
 
   executeWeatherFetchPipeline();
 }
@@ -75,13 +147,21 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  renderSearchSuggestions();
   executeWeatherFetchPipeline();
 });
 
-searchBtn.addEventListener("click", handleCitySearch);
+searchBtn.addEventListener("click", () => handleCitySearch());
+
+cityInput.addEventListener("input", () => {
+  renderSearchSuggestions();
+});
 
 cityInput.addEventListener("keydown", event => {
-  if (event.key === "Enter") searchBtn.click();
+  if (event.key === "Enter") {
+    event.preventDefault();
+    handleCitySearch();
+  }
 });
 
 locationBtn.addEventListener("click", getUserLocation);
@@ -175,6 +255,7 @@ async function executeWeatherFetchPipeline() {
     }
 
     updateCurrentUI(currentData);
+    saveRecentCity(currentData.name);
     setStatus(
       `Weather for ${currentData.name} loaded successfully.`,
       "success",
