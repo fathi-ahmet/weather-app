@@ -127,8 +127,14 @@ input:focus {
   transition: background 0.3s;
 }
 
-#searchBtn:hover {
+#searchBtn:hover:not(:disabled) {
   background: #0984e3;
+}
+
+#searchBtn:disabled,
+#locationBtn:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 #locationBtn {
@@ -145,8 +151,35 @@ input:focus {
   transition: background 0.3s;
 }
 
-#locationBtn:hover {
+#locationBtn:hover:not(:disabled) {
   background: #5b4cc4;
+}
+
+.status-message {
+  display: none;
+  margin: 0 0 15px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-message.info {
+  display: block;
+  background: #eaf4ff;
+  color: #235a9a;
+}
+
+.status-message.success {
+  display: block;
+  background: #eafaf1;
+  color: #1f7a43;
+}
+
+.status-message.error {
+  display: block;
+  background: #fff1f1;
+  color: #b42318;
 }
 
 #weatherResult {
