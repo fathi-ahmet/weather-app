@@ -22,9 +22,37 @@ function setLoadingState(isLoading) {
   searchBtn.disabled = isLoading;
   locationBtn.disabled = isLoading;
   searchBtn.textContent = isLoading ? "Searching..." : "Search";
+  cityInput.disabled = isLoading;
+
   if (!isLoading) {
     locationBtn.textContent = "Use Current Location";
   }
+}
+
+function normalizeCityQuery(value) {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function getEncodedCityQuery() {
+  return encodeURIComponent(normalizeCityQuery(lastQueryParam));
+}
+
+function handleCitySearch() {
+  const city = normalizeCityQuery(cityInput.value);
+  if (!city) {
+    setStatus("Please enter a city name first.", "error");
+    cityInput.focus();
+    return;
+  }
+
+  currentSearchType = "city";
+  lastQueryParam = city;
+  cityInput.value = city;
+
+  localStorage.setItem("weatherSearchType", "city");
+  localStorage.setItem("weatherQueryParam", JSON.stringify(city));
+
+  executeWeatherFetchPipeline();
 }
 
 // Run configuration check when the webpage finishes loading
@@ -41,25 +69,16 @@ window.addEventListener("DOMContentLoaded", () => {
   if (savedSearchType && savedQueryParam) {
     currentSearchType = savedSearchType;
     lastQueryParam = JSON.parse(savedQueryParam);
+
+    if (currentSearchType === "city" && typeof lastQueryParam === "string") {
+      cityInput.value = lastQueryParam;
+    }
   }
 
   executeWeatherFetchPipeline();
 });
 
-searchBtn.addEventListener("click", () => {
-  const city = cityInput.value.trim();
-  if (!city) {
-    setStatus("Please enter a city name first.", "error");
-    return;
-  }
-  currentSearchType = "city";
-  lastQueryParam = city;
-
-  localStorage.setItem("weatherSearchType", "city");
-  localStorage.setItem("weatherQueryParam", JSON.stringify(city));
-
-  executeWeatherFetchPipeline();
-});
+searchBtn.addEventListener("click", handleCitySearch);
 
 cityInput.addEventListener("keydown", event => {
   if (event.key === "Enter") searchBtn.click();
@@ -75,10 +94,11 @@ unitToggle.addEventListener("change", () => {
 
 function getUserLocation() {
   if (!navigator.geolocation) {
-    alert("Geolocation is not supported by your browser.");
+    setStatus("Geolocation is not supported by this browser.", "error");
     return;
   }
 
+  setLoadingState(true);
   locationBtn.innerText = "Locating...";
   navigator.geolocation.getCurrentPosition(
     position => {
@@ -99,7 +119,9 @@ function getUserLocation() {
     error => {
       console.error("Geolocation error:", error);
       setStatus(
-        "Unable to retrieve your location. Please verify your browser location permissions and try again.",
+        error.code === 1
+          ? "Location access was denied. Please allow access and try again."
+          : "Unable to retrieve your location. Please check your connection or device settings and try again.",
         "error",
       );
       locationBtn.innerText = "Use Current Location";
@@ -113,11 +135,14 @@ async function executeWeatherFetchPipeline() {
   let forecastUrl = "";
 
   if (currentSearchType === "city") {
-    currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${lastQueryParam}&appid=${apikey}&units=${currentUnits}`;
-    forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${lastQueryParam}&appid=${apikey}&units=${currentUnits}`;
+    const cityQuery = getEncodedCityQuery();
+    currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityQuery}&appid=${apikey}&units=${currentUnits}`;
+    forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityQuery}&appid=${apikey}&units=${currentUnits}`;
   } else if (currentSearchType === "coords") {
-    currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lastQueryParam.lat}&lon=${lastQueryParam.lon}&appid=${apikey}&units=${currentUnits}`;
-    forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lastQueryParam.lat}&lon=${lastQueryParam.lon}&appid=${apikey}&units=${currentUnits}`;
+    const lat = Number(lastQueryParam.lat);
+    const lon = Number(lastQueryParam.lon);
+    currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apikey}&units=${currentUnits}`;
+    forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apikey}&units=${currentUnits}`;
   }
 
   if (!currentWeatherUrl) {
