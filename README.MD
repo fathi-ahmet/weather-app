@@ -6,13 +6,15 @@
 
 2. API Key Setup:
 
-   The app currently uses a demo OpenWeatherMap API key provided in script.js.
+   This project keeps the API key in a dedicated config file so it is easier to replace and manage.
 
-   For production or extended use, generate your own free API key from OpenWeatherMap.
+   Generate your own free API key from OpenWeatherMap, then open config.js and replace the placeholder value:
 
-   Open script.js and replace the placeholder with your actual key:
+   window.WEATHER_APP_CONFIG = {
+   apiKey: "YOUR_API_KEY_HERE"
+   };
 
-   const apikey = "YOUR_API_KEY_HERE";
+   Note: because this is a browser-based app, a key is still visible to the client in the browser. For production use, a safer pattern is to proxy requests through a backend service.
 
 3. Run the App:
 
