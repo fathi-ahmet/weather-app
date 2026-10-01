@@ -6,31 +6,35 @@
   </head>
   <body>
     <div class="container">
-      <h1>Weather App</h1>
+      <header class="app-header">
+        <h1>Weather App</h1>
 
-      <div class="toggle-container" aria-label="Temperature units">
-        <span aria-hidden="true">°C</span>
-        <label class="switch" for="unitToggle">
-          <input
-            type="checkbox"
-            id="unitToggle"
-            aria-label="Toggle between Celsius and Fahrenheit"
-          />
-          <span class="slider"></span>
-        </label>
-        <span aria-hidden="true">°F</span>
-      </div>
+        <div class="header-controls">
+          <div class="toggle-container" aria-label="Temperature units">
+            <span aria-hidden="true">°C</span>
+            <label class="switch" for="unitToggle">
+              <input
+                type="checkbox"
+                id="unitToggle"
+                aria-label="Toggle between Celsius and Fahrenheit"
+              />
+              <span class="slider"></span>
+            </label>
+            <span aria-hidden="true">°F</span>
+          </div>
 
-      <div class="theme-toggle-container">
-        <label class="theme-switch" for="themeToggle">
-          <input
-            type="checkbox"
-            id="themeToggle"
-            aria-label="Toggle dark mode"
-          />
-          <span class="theme-slider"></span>
-        </label>
-      </div>
+          <div class="theme-toggle-container">
+            <label class="theme-switch" for="themeToggle">
+              <input
+                type="checkbox"
+                id="themeToggle"
+                aria-label="Toggle dark mode"
+              />
+              <span class="theme-slider"></span>
+            </label>
+          </div>
+        </div>
+      </header>
 
       <div class="input-group">
         <label class="sr-only" for="cityInput">City name</label>
