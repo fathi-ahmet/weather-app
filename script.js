@@ -5,6 +5,8 @@ const cityInput = document.getElementById("cityInput");
 const unitToggle = document.getElementById("unitToggle");
 const statusMessage = document.getElementById("statusMessage");
 const searchSuggestions = document.getElementById("searchSuggestions");
+const favoriteBtn = document.getElementById("favoriteBtn");
+const favoritesContainer = document.getElementById("favoritesContainer");
 
 const popularCities = [
   "London",
@@ -22,6 +24,7 @@ const popularCities = [
 let currentUnits = "metric";
 let currentSearchType = "city";
 let lastQueryParam = "London";
+let currentLoadedCity = "";
 
 function setStatus(message, type = "info") {
   if (!statusMessage) return;
@@ -115,6 +118,83 @@ function renderSearchSuggestions() {
   });
 }
 
+function getFavoriteCities() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("weatherFavoriteCities") || "[]",
+    );
+    return Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function updateFavoriteButtonState() {
+  if (!favoriteBtn) return;
+
+  const isFavorite = currentLoadedCity
+    ? getFavoriteCities().some(
+        city => city.toLowerCase() === currentLoadedCity.toLowerCase(),
+      )
+    : false;
+
+  favoriteBtn.disabled = !currentLoadedCity;
+  favoriteBtn.classList.toggle("active", isFavorite);
+  favoriteBtn.setAttribute("aria-pressed", String(isFavorite));
+  favoriteBtn.textContent = isFavorite ? "★ Saved" : "☆ Save City";
+}
+
+function renderFavoriteCities() {
+  if (!favoritesContainer) return;
+
+  const favorites = getFavoriteCities();
+  if (!favorites.length) {
+    favoritesContainer.innerHTML = "";
+    return;
+  }
+
+  favoritesContainer.innerHTML = favorites
+    .map(
+      city => `
+        <button class="favorite-item" type="button" data-city="${city}">
+          ${city}
+        </button>
+      `,
+    )
+    .join("");
+
+  favoritesContainer.querySelectorAll(".favorite-item").forEach(button => {
+    button.addEventListener("click", () => {
+      const selectedCity = button.dataset.city;
+      cityInput.value = selectedCity;
+      handleCitySearch(selectedCity);
+    });
+  });
+}
+
+function toggleFavoriteCity() {
+  if (!currentLoadedCity) return;
+
+  const favorites = getFavoriteCities();
+  const normalizedCurrent = normalizeCityQuery(currentLoadedCity);
+  const isFavorite = favorites.some(
+    city => city.toLowerCase() === normalizedCurrent.toLowerCase(),
+  );
+
+  const updatedFavorites = isFavorite
+    ? favorites.filter(
+        city => city.toLowerCase() !== normalizedCurrent.toLowerCase(),
+      )
+    : [normalizedCurrent, ...favorites].slice(0, 6);
+
+  localStorage.setItem(
+    "weatherFavoriteCities",
+    JSON.stringify(updatedFavorites),
+  );
+  renderFavoriteCities();
+  updateFavoriteButtonState();
+}
+
 function handleCitySearch(forceCity) {
   const city = normalizeCityQuery(forceCity || cityInput.value);
   if (!city) {
@@ -154,11 +234,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  renderFavoriteCities();
   renderSearchSuggestions();
   executeWeatherFetchPipeline();
 });
 
 searchBtn.addEventListener("click", () => handleCitySearch());
+
+favoriteBtn.addEventListener("click", toggleFavoriteCity);
 
 cityInput.addEventListener("input", () => {
   renderSearchSuggestions();
@@ -324,11 +407,19 @@ function resetWeatherResultState() {
     weatherResult.classList.add("empty-state");
   }
 
+  currentLoadedCity = "";
   city.textContent = "No city selected";
   temp.textContent = "Search for a city to see the weather.";
   condition.textContent = "";
   humidity.textContent = "";
   wind.textContent = "";
+
+  if (favoriteBtn) {
+    favoriteBtn.disabled = true;
+    favoriteBtn.classList.remove("active");
+    favoriteBtn.textContent = "☆ Save City";
+    favoriteBtn.setAttribute("aria-pressed", "false");
+  }
 
   if (icon) {
     icon.style.display = "none";
@@ -346,6 +437,7 @@ function updateCurrentUI(data) {
   const weatherResult = document.getElementById("weatherResult");
 
   weatherResult.classList.remove("empty-state");
+  currentLoadedCity = data.name;
 
   document.getElementById("city").innerText = data.name;
   document.getElementById("temp").innerText = `${tempVal}${tempUnit}`;
@@ -365,6 +457,7 @@ function updateCurrentUI(data) {
   const celsiusTemp =
     currentUnits === "metric" ? tempVal : ((tempVal - 32) * 5) / 9;
   document.body.className = celsiusTemp >= 20 ? "hot" : "cold";
+  updateFavoriteButtonState();
 }
 
 function updateForecastUI(data) {
