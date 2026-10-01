@@ -182,8 +182,8 @@ h1 {
 .theme-switch {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
 }
 
 .theme-switch input {
@@ -197,26 +197,20 @@ h1 {
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: transparent;
+  border: none;
   border-radius: 50%;
   transition: 0.25s ease;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
 }
 
 .theme-slider:before {
   content: "☀";
   display: block;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
   color: #f59e0b;
   transition: 0.25s ease;
-}
-
-.theme-switch input:checked + .theme-slider {
-  background: rgba(15, 23, 42, 0.45);
-  border-color: rgba(148, 163, 184, 0.25);
 }
 
 .theme-switch input:checked + .theme-slider:before {
