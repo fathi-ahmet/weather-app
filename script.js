@@ -1,4 +1,4 @@
-const apikey = "71bc1946236544bb78132d31f191712f";
+const apikey = window.WEATHER_APP_CONFIG?.apiKey || "";
 const searchBtn = document.getElementById("searchBtn");
 const locationBtn = document.getElementById("locationBtn");
 const cityInput = document.getElementById("cityInput");
@@ -133,6 +133,14 @@ function getUserLocation() {
 async function executeWeatherFetchPipeline() {
   let currentWeatherUrl = "";
   let forecastUrl = "";
+
+  if (!apikey) {
+    setStatus(
+      "Weather API key is missing. Add your OpenWeatherMap key in config.js before loading the app.",
+      "error",
+    );
+    return;
+  }
 
   if (currentSearchType === "city") {
     const cityQuery = getEncodedCityQuery();
