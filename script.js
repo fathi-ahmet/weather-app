@@ -53,7 +53,9 @@ function getEncodedCityQuery() {
 
 function getRecentCities() {
   try {
-    const saved = JSON.parse(localStorage.getItem("weatherRecentCities") || "[]");
+    const saved = JSON.parse(
+      localStorage.getItem("weatherRecentCities") || "[]",
+    );
     return Array.isArray(saved) ? saved : [];
   } catch (error) {
     return [];
@@ -65,7 +67,10 @@ function saveRecentCity(city) {
   if (!cleanedCity) return;
 
   const recent = getRecentCities();
-  const updated = [cleanedCity, ...recent.filter(item => item.toLowerCase() !== cleanedCity.toLowerCase())].slice(0, 6);
+  const updated = [
+    cleanedCity,
+    ...recent.filter(item => item.toLowerCase() !== cleanedCity.toLowerCase()),
+  ].slice(0, 6);
   localStorage.setItem("weatherRecentCities", JSON.stringify(updated));
   renderSearchSuggestions();
 }
@@ -79,7 +84,9 @@ function renderSearchSuggestions() {
     ? [...recentCities, ...popularCities]
         .filter((city, index, array) => {
           const normalizedCity = city.toLowerCase();
-          return normalizedCity.includes(query) && array.indexOf(city) === index;
+          return (
+            normalizedCity.includes(query) && array.indexOf(city) === index
+          );
         })
         .slice(0, 6)
     : [...recentCities, ...popularCities].slice(0, 6);
@@ -235,6 +242,13 @@ async function executeWeatherFetchPipeline() {
 
   if (!currentWeatherUrl) {
     setStatus("Weather request is missing location information.", "error");
+    resetWeatherResultState();
+    const forecastContainer = document.getElementById("forecastContainer");
+    if (forecastContainer) {
+      forecastContainer.innerHTML =
+        "Forecast will appear here after a successful search.";
+      forecastContainer.classList.add("forecast-empty");
+    }
     return;
   }
 
@@ -250,6 +264,13 @@ async function executeWeatherFetchPipeline() {
         `Unable to find weather for "${lastQueryParam}". Please try a different city.`,
         "error",
       );
+      resetWeatherResultState();
+      const forecastContainer = document.getElementById("forecastContainer");
+      if (forecastContainer) {
+        forecastContainer.innerHTML =
+          "Forecast will appear here after a successful search.";
+        forecastContainer.classList.add("forecast-empty");
+      }
       setLoadingState(false);
       return;
     }
@@ -274,6 +295,13 @@ async function executeWeatherFetchPipeline() {
     }
   } catch (error) {
     console.error("Pipeline network error:", error);
+    resetWeatherResultState();
+    const forecastContainer = document.getElementById("forecastContainer");
+    if (forecastContainer) {
+      forecastContainer.innerHTML =
+        "Forecast will appear here after a successful search.";
+      forecastContainer.classList.add("forecast-empty");
+    }
     setStatus(
       "Unable to fetch weather data right now. Please check your internet connection and try again.",
       "error",
@@ -283,12 +311,41 @@ async function executeWeatherFetchPipeline() {
   }
 }
 
+function resetWeatherResultState() {
+  const weatherResult = document.getElementById("weatherResult");
+  const city = document.getElementById("city");
+  const temp = document.getElementById("temp");
+  const condition = document.getElementById("condition");
+  const humidity = document.getElementById("humidity");
+  const wind = document.getElementById("wind");
+  const icon = document.getElementById("weatherIcon");
+
+  if (weatherResult) {
+    weatherResult.classList.add("empty-state");
+  }
+
+  city.textContent = "No city selected";
+  temp.textContent = "Search for a city to see the weather.";
+  condition.textContent = "";
+  humidity.textContent = "";
+  wind.textContent = "";
+
+  if (icon) {
+    icon.style.display = "none";
+    icon.src = "";
+    icon.alt = "";
+  }
+}
+
 function updateCurrentUI(data) {
   const tempVal = Math.round(data.main.temp);
   const windVal = data.wind.speed;
   const tempUnit = currentUnits === "metric" ? "°C" : "°F";
   const windUnit = currentUnits === "metric" ? "m/s" : "mph";
   const formattedDescription = capitalizeWords(data.weather[0].description);
+  const weatherResult = document.getElementById("weatherResult");
+
+  weatherResult.classList.remove("empty-state");
 
   document.getElementById("city").innerText = data.name;
   document.getElementById("temp").innerText = `${tempVal}${tempUnit}`;
@@ -313,6 +370,7 @@ function updateCurrentUI(data) {
 function updateForecastUI(data) {
   const container = document.getElementById("forecastContainer");
   container.innerHTML = "";
+  container.classList.remove("forecast-empty");
 
   const tempUnit = currentUnits === "metric" ? "°C" : "°F";
   const dailyMap = new Map();
