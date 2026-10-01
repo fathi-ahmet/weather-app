@@ -138,6 +138,8 @@ body.dark-mode #cityInput::placeholder {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.45);
 }
 
 h1 {
@@ -147,6 +149,7 @@ h1 {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .header-controls {
@@ -162,7 +165,8 @@ h1 {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 700;
   color: #2d3436;
 }
 
@@ -526,6 +530,16 @@ p {
   padding: 10px;
   border-radius: 10px;
   text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.forecast-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  border-color: rgba(116, 185, 255, 0.7);
 }
 
 .forecast-card h4 {
