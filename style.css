@@ -121,6 +121,32 @@ input:checked + .slider:before {
   margin-bottom: 10px;
 }
 
+.search-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  justify-content: center;
+}
+
+.search-suggestion {
+  padding: 7px 10px;
+  border: 1px solid #dfe6e9;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #2d3436;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.search-suggestion:hover,
+.search-suggestion:focus-visible {
+  background: #eaf4ff;
+  border-color: #74b9ff;
+  outline: none;
+}
+
 input[type="text"],
 #cityInput {
   width: 70%;
