@@ -3,10 +3,29 @@ const searchBtn = document.getElementById("searchBtn");
 const locationBtn = document.getElementById("locationBtn");
 const cityInput = document.getElementById("cityInput");
 const unitToggle = document.getElementById("unitToggle");
+const statusMessage = document.getElementById("statusMessage");
 
 let currentUnits = "metric";
 let currentSearchType = "city";
 let lastQueryParam = "London";
+
+function setStatus(message, type = "info") {
+  if (!statusMessage) return;
+
+  statusMessage.textContent = message;
+  statusMessage.className = `status-message ${type}`;
+}
+
+function setLoadingState(isLoading) {
+  if (!searchBtn || !locationBtn) return;
+
+  searchBtn.disabled = isLoading;
+  locationBtn.disabled = isLoading;
+  searchBtn.textContent = isLoading ? "Searching..." : "Search";
+  if (!isLoading) {
+    locationBtn.textContent = "Use Current Location";
+  }
+}
 
 // Run configuration check when the webpage finishes loading
 window.addEventListener("DOMContentLoaded", () => {
@@ -30,7 +49,7 @@ window.addEventListener("DOMContentLoaded", () => {
 searchBtn.addEventListener("click", () => {
   const city = cityInput.value.trim();
   if (!city) {
-    alert("Please enter a city name first.");
+    setStatus("Please enter a city name first.", "error");
     return;
   }
   currentSearchType = "city";
@@ -42,7 +61,7 @@ searchBtn.addEventListener("click", () => {
   executeWeatherFetchPipeline();
 });
 
-cityInput.addEventListener("keydown", (event) => {
+cityInput.addEventListener("keydown", event => {
   if (event.key === "Enter") searchBtn.click();
 });
 
@@ -62,7 +81,7 @@ function getUserLocation() {
 
   locationBtn.innerText = "Locating...";
   navigator.geolocation.getCurrentPosition(
-    (position) => {
+    position => {
       const coords = {
         lat: position.coords.latitude,
         lon: position.coords.longitude,
@@ -77,11 +96,14 @@ function getUserLocation() {
       executeWeatherFetchPipeline();
       locationBtn.innerText = "Use Current Location";
     },
-    (error) => {
-      alert(
-        "Unable to retrieve your location. Please verify your browser location permissions.",
+    error => {
+      console.error("Geolocation error:", error);
+      setStatus(
+        "Unable to retrieve your location. Please verify your browser location permissions and try again.",
+        "error",
       );
       locationBtn.innerText = "Use Current Location";
+      setLoadingState(false);
     },
   );
 }
@@ -98,24 +120,52 @@ async function executeWeatherFetchPipeline() {
     forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lastQueryParam.lat}&lon=${lastQueryParam.lon}&appid=${apikey}&units=${currentUnits}`;
   }
 
+  if (!currentWeatherUrl) {
+    setStatus("Weather request is missing location information.", "error");
+    return;
+  }
+
+  setLoadingState(true);
+  setStatus("Loading weather data...", "info");
+
   try {
     const currentRes = await fetch(currentWeatherUrl);
     const currentData = await currentRes.json();
 
     if (!currentRes.ok) {
-      alert(`Error: ${currentData.message}`);
+      setStatus(
+        `Unable to find weather for "${lastQueryParam}". Please try a different city.`,
+        "error",
+      );
+      setLoadingState(false);
       return;
     }
+
     updateCurrentUI(currentData);
+    setStatus(
+      `Weather for ${currentData.name} loaded successfully.`,
+      "success",
+    );
 
     const forecastRes = await fetch(forecastUrl);
     const forecastData = await forecastRes.json();
 
     if (forecastRes.ok) {
       updateForecastUI(forecastData);
+    } else {
+      setStatus(
+        "Current weather is available, but the forecast could not be loaded right now.",
+        "info",
+      );
     }
   } catch (error) {
     console.error("Pipeline network error:", error);
+    setStatus(
+      "Unable to fetch weather data right now. Please check your internet connection and try again.",
+      "error",
+    );
+  } finally {
+    setLoadingState(false);
   }
 }
 
@@ -153,7 +203,7 @@ function updateForecastUI(data) {
   const targetIndexes = [7, 15, 23]; // Roughly 24h, 48h, and 72h out
   const tempUnit = currentUnits === "metric" ? "°C" : "°F";
 
-  targetIndexes.forEach((index) => {
+  targetIndexes.forEach(index => {
     const item = data.list[index];
     if (!item) return;
 
@@ -174,6 +224,6 @@ function updateForecastUI(data) {
 function capitalizeWords(str) {
   return str
     .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
