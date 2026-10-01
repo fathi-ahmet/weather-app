@@ -7,6 +7,7 @@ const statusMessage = document.getElementById("statusMessage");
 const searchSuggestions = document.getElementById("searchSuggestions");
 const favoriteBtn = document.getElementById("favoriteBtn");
 const favoritesContainer = document.getElementById("favoritesContainer");
+const themeToggle = document.getElementById("themeToggle");
 
 const popularCities = [
   "London",
@@ -25,6 +26,7 @@ let currentUnits = "metric";
 let currentSearchType = "city";
 let lastQueryParam = "London";
 let currentLoadedCity = "";
+let currentTheme = localStorage.getItem("weatherTheme") || "light";
 
 function setStatus(message, type = "info") {
   if (!statusMessage) return;
@@ -195,6 +197,15 @@ function toggleFavoriteCity() {
   updateFavoriteButtonState();
 }
 
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark-mode", isDark);
+  if (themeToggle) {
+    themeToggle.checked = isDark;
+  }
+  localStorage.setItem("weatherTheme", theme);
+}
+
 function handleCitySearch(forceCity) {
   const city = normalizeCityQuery(forceCity || cityInput.value);
   if (!city) {
@@ -222,6 +233,10 @@ window.addEventListener("DOMContentLoaded", () => {
     currentUnits = "imperial";
   }
 
+  const savedTheme = localStorage.getItem("weatherTheme") || "light";
+  currentTheme = savedTheme;
+  applyTheme(currentTheme);
+
   const savedSearchType = localStorage.getItem("weatherSearchType");
   const savedQueryParam = localStorage.getItem("weatherQueryParam");
 
@@ -242,6 +257,10 @@ window.addEventListener("DOMContentLoaded", () => {
 searchBtn.addEventListener("click", () => handleCitySearch());
 
 favoriteBtn.addEventListener("click", toggleFavoriteCity);
+
+themeToggle.addEventListener("change", () => {
+  applyTheme(themeToggle.checked ? "dark" : "light");
+});
 
 cityInput.addEventListener("input", () => {
   renderSearchSuggestions();
