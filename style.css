@@ -157,6 +157,7 @@ h1 {
   align-items: center;
   gap: 14px;
   margin-left: auto;
+  margin-right: 4px;
 }
 
 /* Toggle Switch Styling */
@@ -175,13 +176,14 @@ h1 {
   align-items: center;
   justify-content: center;
   z-index: 2;
+  margin-right: 2px;
 }
 
 .theme-switch {
   position: relative;
   display: inline-block;
-  width: 46px;
-  height: 24px;
+  width: 52px;
+  height: 28px;
 }
 
 .theme-switch input {
@@ -205,11 +207,11 @@ h1 {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1;
   background: transparent;
   border-radius: 50%;
@@ -218,7 +220,7 @@ h1 {
 
 .theme-switch input:checked + .theme-slider:before {
   content: "☾";
-  left: 22px;
+  left: 26px;
   color: #f8fafc;
 }
 
@@ -397,8 +399,8 @@ input:focus {
 #cityInput:focus-visible,
 .switch:focus-within,
 .theme-switch:focus-within {
-  outline: 3px solid rgba(21, 101, 192, 0.45);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: none;
 }
 
 #searchBtn:disabled,
