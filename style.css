@@ -268,8 +268,8 @@ input:checked + .slider {
 input:checked + .slider:before {
   content: "F";
   left: 24px;
-  background: rgba(15, 23, 42, 0.8);
-  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.85);
+  color: #2d3436;
 }
 
 .input-group {
@@ -340,7 +340,7 @@ input:checked + .slider:before {
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
-  margin: 0 0 18px;
+  margin: 8px 0 18px;
 }
 
 .favorite-item {
