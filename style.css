@@ -85,10 +85,12 @@ body.dark-mode .status-message.error {
 
 body.dark-mode .weather-result.empty-state,
 body.dark-mode .forecast-empty,
+body.dark-mode .hourly-forecast,
 body.dark-mode .search-suggestion,
 body.dark-mode #favoriteBtn,
 body.dark-mode .favorite-item,
-body.dark-mode .forecast-card {
+body.dark-mode .forecast-card,
+body.dark-mode .hourly-forecast-card {
   background: rgba(30, 41, 59, 0.8);
   border-color: rgba(148, 163, 184, 0.35);
 }
@@ -459,6 +461,50 @@ button:hover:not(:disabled) {
   padding: 20px 16px;
 }
 
+.weather-alert {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(254, 226, 226, 0.9);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #991b1b;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.weather-alert.hidden {
+  display: none;
+}
+
+.weather-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.weather-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.weather-detail-item span {
+  font-size: 12px;
+  color: #475569;
+}
+
+.weather-detail-item strong {
+  font-size: 14px;
+  color: #1f2937;
+}
+
 .forecast-empty {
   margin-top: 20px;
   padding: 16px 12px;
@@ -527,6 +573,64 @@ p {
 
 #forecastContainer {
   margin-top: 20px;
+}
+
+.hourly-forecast {
+  margin-top: 20px;
+  padding: 16px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.hourly-forecast.empty {
+  color: #636e72;
+  font-size: 14px;
+  text-align: center;
+}
+
+.hourly-forecast-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hourly-forecast-card {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.hourly-time,
+.hourly-temp,
+.hourly-condition,
+.hourly-rain {
+  margin: 4px 0;
+}
+
+.hourly-time {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.hourly-temp {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.hourly-condition {
+  font-size: 11px;
+  color: #475569;
+}
+
+.hourly-rain {
+  font-size: 11px;
+  color: #0284c7;
 }
 
 .forecast-title {
