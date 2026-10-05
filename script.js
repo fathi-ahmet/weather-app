@@ -180,7 +180,11 @@ function renderFavoriteCities() {
 async function renderCityDashboard() {
   if (!cityDashboard) return;
 
-  const favorites = getFavoriteCities().slice(0, 4);
+  const favorites = getFavoriteCities()
+    .map(city => normalizeCityQuery(city))
+    .filter(Boolean)
+    .slice(0, 4);
+
   if (!favorites.length) {
     cityDashboard.classList.add("hidden");
     cityDashboard.innerHTML = "";
@@ -190,37 +194,52 @@ async function renderCityDashboard() {
   cityDashboard.classList.remove("hidden");
   cityDashboard.innerHTML = "";
 
-  const cards = await Promise.all(
+  const cards = await Promise.allSettled(
     favorites.map(async city => {
-      try {
-        const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apikey}&units=${currentUnits}`,
-        );
-        if (!response.ok) {
-          throw new Error("City lookup failed");
-        }
-        const data = await response.json();
-        return {
-          city: data.name,
-          temp: `${Math.round(data.main.temp)}${currentUnits === "metric" ? "°C" : "°F"}`,
-          description: capitalizeWords(data.weather[0].description),
-          icon: data.weather[0].icon,
-        };
-      } catch (error) {
-        return {
-          city,
-          temp: "--",
-          description: "Unavailable",
-          icon: "",
-        };
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apikey}&units=${currentUnits}`,
+      );
+
+      if (!response.ok) {
+        throw new Error("City lookup failed");
       }
+
+      const data = await response.json();
+      const description =
+        data?.weather?.[0]?.description || "Current conditions";
+
+      return {
+        city: data.name || city,
+        temp: `${Math.round(data.main.temp)}${currentUnits === "metric" ? "°C" : "°F"}`,
+        description: capitalizeWords(description),
+        icon: data.weather?.[0]?.icon || "",
+      };
     }),
   );
+
+  const resolvedCards = cards
+    .map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
+  if (!resolvedCards.length) {
+    cityDashboard.classList.remove("hidden");
+    cityDashboard.innerHTML = `
+      <h3 class="dashboard-title">City Dashboard</h3>
+      <p class="dashboard-empty">No live city data available right now.</p>
+    `;
+    return;
+  }
 
   cityDashboard.innerHTML = `
     <h3 class="dashboard-title">City Dashboard</h3>
     <div class="dashboard-grid">
-      ${cards
+      ${resolvedCards
         .map(
           item => `
             <button class="dashboard-card" type="button" data-city="${item.city}">
