@@ -423,6 +423,7 @@ async function executeWeatherFetchPipeline() {
 function resetWeatherResultState() {
   const weatherResult = document.getElementById("weatherResult");
   const city = document.getElementById("city");
+  const cityDateTime = document.getElementById("cityDateTime");
   const temp = document.getElementById("temp");
   const condition = document.getElementById("condition");
   const humidity = document.getElementById("humidity");
@@ -444,6 +445,9 @@ function resetWeatherResultState() {
 
   currentLoadedCity = "";
   city.textContent = "No city selected";
+  if (cityDateTime) {
+    cityDateTime.textContent = "—";
+  }
   temp.textContent = "Search for a city to see the weather.";
   condition.textContent = "";
   humidity.textContent = "";
@@ -486,12 +490,17 @@ function updateCurrentUI(data) {
   const formattedDescription = capitalizeWords(data.weather[0].description);
   const weatherResult = document.getElementById("weatherResult");
   const detailContainer = document.getElementById("weatherDetails");
+  const cityDateTime = document.getElementById("cityDateTime");
 
   weatherResult.classList.remove("empty-state");
   currentLoadedCity = data.name;
   renderWeatherAlert(data.weather[0].description);
 
   document.getElementById("city").innerText = data.name;
+  if (cityDateTime) {
+    const cityTimeData = WeatherAppUtils.formatCityDateTime(data);
+    cityDateTime.textContent = `${cityTimeData.date} • ${cityTimeData.time}`;
+  }
   document.getElementById("temp").innerText = `${tempVal}${tempUnit}`;
   document.getElementById("condition").innerText =
     `Condition: ${formattedDescription}`;
