@@ -105,6 +105,23 @@
     return `Weather alert: ${capitalizeWords(description)} may affect travel or outdoor plans.`;
   }
 
+  function buildAirQualityInfo(data) {
+    const item = data && Array.isArray(data.list) ? data.list[0] : null;
+    const aqi = Number(item?.main?.aqi ?? 0);
+    const categories = ["Good", "Fair", "Moderate", "Poor", "Very Poor"];
+
+    const category = categories[Math.max(0, Math.min(4, aqi - 1))] ?? "Good";
+    const components = item?.components || {};
+
+    return {
+      label: "Air Quality",
+      category,
+      aqi,
+      pm25: `${Number(components.pm2_5 ?? 0).toFixed(1)} µg/m³`,
+      o3: `${Number(components.o3 ?? 0).toFixed(1)} µg/m³`,
+    };
+  }
+
   function formatCityDateTime(data) {
     if (!data || typeof data.dt !== "number") {
       return { date: "N/A", time: "N/A" };
@@ -131,6 +148,7 @@
   }
 
   const api = {
+    buildAirQualityInfo,
     buildHourlyForecastData,
     buildWeatherAlertMessage,
     buildWeatherMetrics,

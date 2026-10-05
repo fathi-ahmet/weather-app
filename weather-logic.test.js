@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  buildAirQualityInfo,
   buildHourlyForecastData,
   buildWeatherAlertMessage,
   buildWeatherMetrics,
@@ -106,4 +107,16 @@ test("formatCityDateTime reflects the city timezone instead of the browser timez
 
   assert.equal(result.date, "Tue, Jan 2");
   assert.equal(result.time, "1:00 AM");
+});
+
+test("buildAirQualityInfo maps AQI categories clearly", () => {
+  const result = buildAirQualityInfo({
+    list: [{ main: { aqi: 2 }, components: { pm2_5: 12.2, o3: 24.1 } }],
+  });
+
+  assert.equal(result.label, "Air Quality");
+  assert.equal(result.category, "Fair");
+  assert.equal(result.aqi, 2);
+  assert.equal(result.pm25, "12.2 µg/m³");
+  assert.equal(result.o3, "24.1 µg/m³");
 });

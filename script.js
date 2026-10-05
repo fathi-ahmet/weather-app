@@ -392,6 +392,19 @@ async function executeWeatherFetchPipeline() {
 
     const forecastRes = await fetch(forecastUrl);
     const forecastData = await forecastRes.json();
+    const airQualityUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${currentData.coord.lat}&lon=${currentData.coord.lon}&appid=${apikey}`;
+
+    try {
+      const airQualityRes = await fetch(airQualityUrl);
+      const airQualityData = await airQualityRes.json();
+      if (airQualityRes.ok) {
+        renderAirQuality(airQualityData);
+      } else {
+        renderAirQuality(null);
+      }
+    } catch (error) {
+      renderAirQuality(null);
+    }
 
     if (forecastRes.ok) {
       updateHourlyForecastUI(forecastData);
@@ -480,6 +493,31 @@ function renderWeatherAlert(description) {
 
   alertBox.textContent = message;
   alertBox.classList.remove("hidden");
+}
+
+function renderAirQuality(data) {
+  const container = document.getElementById("airQualityContainer");
+  if (!container) return;
+
+  if (!data || !data.list || !data.list.length) {
+    container.innerHTML = "";
+    container.classList.add("hidden");
+    return;
+  }
+
+  const info = WeatherAppUtils.buildAirQualityInfo(data);
+  container.innerHTML = `
+    <div class="air-quality-header">
+      <span>${info.label}</span>
+      <strong>${info.category}</strong>
+    </div>
+    <div class="air-quality-value">AQI ${info.aqi}</div>
+    <div class="air-quality-components">
+      <span>PM2.5: ${info.pm25}</span>
+      <span>O₃: ${info.o3}</span>
+    </div>
+  `;
+  container.classList.remove("hidden");
 }
 
 function updateCurrentUI(data) {
