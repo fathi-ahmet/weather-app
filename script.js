@@ -394,6 +394,7 @@ async function executeWeatherFetchPipeline() {
     const forecastData = await forecastRes.json();
 
     if (forecastRes.ok) {
+      updateHourlyForecastUI(forecastData);
       updateForecastUI(forecastData);
     } else {
       setStatus(
@@ -427,9 +428,18 @@ function resetWeatherResultState() {
   const humidity = document.getElementById("humidity");
   const wind = document.getElementById("wind");
   const icon = document.getElementById("weatherIcon");
+  const hourlyForecastContainer = document.getElementById(
+    "hourlyForecastContainer",
+  );
 
   if (weatherResult) {
     weatherResult.classList.add("empty-state");
+  }
+
+  if (hourlyForecastContainer) {
+    hourlyForecastContainer.innerHTML =
+      "Hourly forecast will appear here after a successful search.";
+    hourlyForecastContainer.classList.add("empty");
   }
 
   currentLoadedCity = "";
@@ -453,6 +463,21 @@ function resetWeatherResultState() {
   }
 }
 
+function renderWeatherAlert(description) {
+  const alertBox = document.getElementById("weatherAlert");
+  if (!alertBox) return;
+
+  const message = WeatherAppUtils.buildWeatherAlertMessage(description);
+  if (!message) {
+    alertBox.textContent = "";
+    alertBox.classList.add("hidden");
+    return;
+  }
+
+  alertBox.textContent = message;
+  alertBox.classList.remove("hidden");
+}
+
 function updateCurrentUI(data) {
   const tempVal = Math.round(data.main.temp);
   const windVal = data.wind.speed;
@@ -460,9 +485,11 @@ function updateCurrentUI(data) {
   const windUnit = currentUnits === "metric" ? "m/s" : "mph";
   const formattedDescription = capitalizeWords(data.weather[0].description);
   const weatherResult = document.getElementById("weatherResult");
+  const detailContainer = document.getElementById("weatherDetails");
 
   weatherResult.classList.remove("empty-state");
   currentLoadedCity = data.name;
+  renderWeatherAlert(data.weather[0].description);
 
   document.getElementById("city").innerText = data.name;
   document.getElementById("temp").innerText = `${tempVal}${tempUnit}`;
@@ -472,6 +499,20 @@ function updateCurrentUI(data) {
     `Humidity: ${data.main.humidity}%`;
   document.getElementById("wind").innerText =
     `Wind Speed: ${windVal} ${windUnit}`;
+
+  if (detailContainer) {
+    const details = WeatherAppUtils.buildWeatherMetrics(data, currentUnits);
+    detailContainer.innerHTML = details
+      .map(
+        detail => `
+          <div class="weather-detail-item">
+            <span>${detail.label}</span>
+            <strong>${detail.value}</strong>
+          </div>
+        `,
+      )
+      .join("");
+  }
 
   const iconImg = document.getElementById("weatherIcon");
   iconImg.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
@@ -483,6 +524,57 @@ function updateCurrentUI(data) {
     currentUnits === "metric" ? tempVal : ((tempVal - 32) * 5) / 9;
   applyWeatherBackground(celsiusTemp);
   updateFavoriteButtonState();
+}
+
+function updateHourlyForecastUI(data) {
+  const container = document.getElementById("hourlyForecastContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+  container.classList.remove("empty");
+
+  const tempUnit = currentUnits === "metric" ? "°C" : "°F";
+  const hourlyEntries = WeatherAppUtils.buildHourlyForecastData(
+    data,
+    8,
+    currentUnits,
+  );
+
+  if (!hourlyEntries.length) {
+    container.innerHTML =
+      "Hourly forecast will appear here after a successful search.";
+    container.classList.add("empty");
+    return;
+  }
+
+  const title = document.createElement("h3");
+  title.className = "forecast-title";
+  title.textContent = "Next 8 Hours";
+  container.appendChild(title);
+
+  const row = document.createElement("div");
+  row.className = "hourly-forecast-row";
+
+  hourlyEntries.forEach(entry => {
+    const card = document.createElement("div");
+    card.className = "hourly-forecast-card";
+
+    const iconSrc = entry.icon
+      ? `https://openweathermap.org/img/wn/${entry.icon}.png`
+      : "";
+
+    card.innerHTML = `
+      <p class="hourly-time">${entry.hourLabel}</p>
+      <img src="${iconSrc}" alt="${entry.condition}" />
+      <p class="hourly-temp">${entry.temperature}${tempUnit}</p>
+      <p class="hourly-condition">${entry.condition}</p>
+      <p class="hourly-rain">Rain: ${entry.rainChance}%</p>
+    `;
+
+    row.appendChild(card);
+  });
+
+  container.appendChild(row);
 }
 
 function updateForecastUI(data) {
