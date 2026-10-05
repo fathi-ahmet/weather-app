@@ -66,6 +66,12 @@
 
       <div id="statusMessage" class="status-message" aria-live="polite"></div>
 
+      <div
+        id="weatherAlert"
+        class="weather-alert hidden"
+        aria-live="polite"
+      ></div>
+
       <div class="weather-actions">
         <button id="favoriteBtn" type="button" aria-pressed="false">
           ☆ Save City
@@ -85,17 +91,28 @@
         <p id="wind"></p>
       </div>
 
+      <div id="weatherDetails" class="weather-details" aria-live="polite"></div>
+
       <div
         id="favoritesContainer"
         class="favorites-container"
         aria-live="polite"
       ></div>
 
+      <div
+        id="hourlyForecastContainer"
+        class="hourly-forecast empty"
+        aria-live="polite"
+      >
+        Hourly forecast will appear here after a successful search.
+      </div>
+
       <div id="forecastContainer" class="forecast-empty" aria-live="polite">
         Forecast will appear here after a successful search.
       </div>
     </div>
     <script src="config.js"></script>
+    <script src="weather-logic.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
