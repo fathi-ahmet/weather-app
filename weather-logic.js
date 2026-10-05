@@ -47,18 +47,20 @@
     const visibilityKm = data.visibility
       ? Number((data.visibility / 1000).toFixed(1))
       : 0;
-    const sunrise = data.sys && data.sys.sunrise
-      ? new Date(data.sys.sunrise * 1000).toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-        })
-      : "N/A";
-    const sunset = data.sys && data.sys.sunset
-      ? new Date(data.sys.sunset * 1000).toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-        })
-      : "N/A";
+    const sunrise =
+      data.sys && data.sys.sunrise
+        ? new Date(data.sys.sunrise * 1000).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          })
+        : "N/A";
+    const sunset =
+      data.sys && data.sys.sunset
+        ? new Date(data.sys.sunset * 1000).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          })
+        : "N/A";
 
     return [
       {
@@ -103,11 +105,37 @@
     return `Weather alert: ${capitalizeWords(description)} may affect travel or outdoor plans.`;
   }
 
+  function formatCityDateTime(data) {
+    if (!data || typeof data.dt !== "number") {
+      return { date: "N/A", time: "N/A" };
+    }
+
+    const timezoneOffsetSeconds = Number(data.timezone) || 0;
+    const cityDate = new Date((data.dt + timezoneOffsetSeconds) * 1000);
+
+    const date = new Intl.DateTimeFormat("en-US", {
+      timeZone: "UTC",
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    }).format(cityDate);
+
+    const time = new Intl.DateTimeFormat("en-US", {
+      timeZone: "UTC",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(cityDate);
+
+    return { date, time };
+  }
+
   const api = {
     buildHourlyForecastData,
     buildWeatherAlertMessage,
     buildWeatherMetrics,
     capitalizeWords,
+    formatCityDateTime,
   };
 
   if (typeof module !== "undefined" && module.exports) {

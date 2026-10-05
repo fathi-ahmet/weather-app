@@ -4,6 +4,7 @@ const {
   buildHourlyForecastData,
   buildWeatherAlertMessage,
   buildWeatherMetrics,
+  formatCityDateTime,
 } = require("./weather-logic.js");
 
 test("buildHourlyForecastData keeps the next 8 hourly entries and normalizes values", () => {
@@ -95,4 +96,14 @@ test("buildWeatherAlertMessage flags severe conditions", () => {
     result,
     "Weather alert: Thunderstorm With Heavy Rain may affect travel or outdoor plans.",
   );
+});
+
+test("formatCityDateTime reflects the city timezone instead of the browser timezone", () => {
+  const result = formatCityDateTime({
+    dt: 1704153600,
+    timezone: 3600,
+  });
+
+  assert.equal(result.date, "Tue, Jan 2");
+  assert.equal(result.time, "1:00 AM");
 });
