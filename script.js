@@ -7,6 +7,7 @@ const statusMessage = document.getElementById("statusMessage");
 const searchSuggestions = document.getElementById("searchSuggestions");
 const favoriteBtn = document.getElementById("favoriteBtn");
 const favoritesContainer = document.getElementById("favoritesContainer");
+const cityDashboard = document.getElementById("cityDashboard");
 const themeToggle = document.getElementById("themeToggle");
 
 const popularCities = [
@@ -172,6 +173,77 @@ function renderFavoriteCities() {
       handleCitySearch(selectedCity);
     });
   });
+
+  renderCityDashboard();
+}
+
+async function renderCityDashboard() {
+  if (!cityDashboard) return;
+
+  const favorites = getFavoriteCities().slice(0, 4);
+  if (!favorites.length) {
+    cityDashboard.classList.add("hidden");
+    cityDashboard.innerHTML = "";
+    return;
+  }
+
+  cityDashboard.classList.remove("hidden");
+  cityDashboard.innerHTML = "";
+
+  const cards = await Promise.all(
+    favorites.map(async city => {
+      try {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apikey}&units=${currentUnits}`,
+        );
+        if (!response.ok) {
+          throw new Error("City lookup failed");
+        }
+        const data = await response.json();
+        return {
+          city: data.name,
+          temp: `${Math.round(data.main.temp)}${currentUnits === "metric" ? "°C" : "°F"}`,
+          description: capitalizeWords(data.weather[0].description),
+          icon: data.weather[0].icon,
+        };
+      } catch (error) {
+        return {
+          city,
+          temp: "--",
+          description: "Unavailable",
+          icon: "",
+        };
+      }
+    }),
+  );
+
+  cityDashboard.innerHTML = `
+    <h3 class="dashboard-title">City Dashboard</h3>
+    <div class="dashboard-grid">
+      ${cards
+        .map(
+          item => `
+            <button class="dashboard-card" type="button" data-city="${item.city}">
+              <div class="dashboard-city">${item.city}</div>
+              <div class="dashboard-temp">${item.temp}</div>
+              <div class="dashboard-info">
+                ${item.icon ? `<img src="https://openweathermap.org/img/wn/${item.icon}.png" alt="${item.description}" />` : ""}
+                <span>${item.description}</span>
+              </div>
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+
+  cityDashboard.querySelectorAll(".dashboard-card").forEach(button => {
+    button.addEventListener("click", () => {
+      const selectedCity = button.dataset.city;
+      cityInput.value = selectedCity;
+      handleCitySearch(selectedCity);
+    });
+  });
 }
 
 function toggleFavoriteCity() {
@@ -206,10 +278,34 @@ function applyTheme(theme) {
   localStorage.setItem("weatherTheme", theme);
 }
 
-function applyWeatherBackground(tempCelsius) {
-  const isHot = tempCelsius >= 20;
-  document.body.classList.toggle("hot", isHot);
-  document.body.classList.toggle("cold", !isHot);
+function applyWeatherBackground(tempCelsius, description = "") {
+  const sceneClass = WeatherAppUtils.getWeatherSceneClass(
+    description,
+    tempCelsius,
+  );
+
+  [
+    "weather-sunny",
+    "weather-clear",
+    "weather-cloudy",
+    "weather-rain",
+    "weather-storm",
+    "weather-snow",
+    "weather-fog",
+    "weather-cold",
+    "hot",
+    "cold",
+  ].forEach(className => {
+    document.body.classList.remove(className);
+  });
+
+  document.body.classList.add(sceneClass);
+  if (tempCelsius >= 20 && sceneClass === "weather-clear") {
+    document.body.classList.add("hot");
+  }
+  if (tempCelsius < 20 && sceneClass === "weather-clear") {
+    document.body.classList.add("cold");
+  }
 }
 
 function handleCitySearch(forceCity) {
@@ -569,7 +665,7 @@ function updateCurrentUI(data) {
   // Use Celsius equivalent for the theme switcher breakpoint (20°C)
   const celsiusTemp =
     currentUnits === "metric" ? tempVal : ((tempVal - 32) * 5) / 9;
-  applyWeatherBackground(celsiusTemp);
+  applyWeatherBackground(celsiusTemp, data.weather[0].description);
   updateFavoriteButtonState();
 }
 

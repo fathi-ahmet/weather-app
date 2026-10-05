@@ -2,10 +2,12 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   buildAirQualityInfo,
+  buildCityDashboardSnapshot,
   buildHourlyForecastData,
   buildWeatherAlertMessage,
   buildWeatherMetrics,
   formatCityDateTime,
+  getWeatherSceneClass,
 } = require("./weather-logic.js");
 
 test("buildHourlyForecastData keeps the next 8 hourly entries and normalizes values", () => {
@@ -119,4 +121,22 @@ test("buildAirQualityInfo maps AQI categories clearly", () => {
   assert.equal(result.aqi, 2);
   assert.equal(result.pm25, "12.2 µg/m³");
   assert.equal(result.o3, "24.1 µg/m³");
+});
+
+test("getWeatherSceneClass picks a matching weather mood", () => {
+  assert.equal(getWeatherSceneClass("light rain", 18), "weather-rain");
+  assert.equal(getWeatherSceneClass("clear sky", 32), "weather-sunny");
+  assert.equal(getWeatherSceneClass("broken clouds", 15), "weather-cloudy");
+});
+
+test("buildCityDashboardSnapshot keeps the list shape ready for rendering", () => {
+  const result = buildCityDashboardSnapshot(["London", "Paris"]).map(item => ({
+    city: item.city,
+    description: item.description,
+  }));
+
+  assert.deepEqual(result, [
+    { city: "London", description: "Waiting" },
+    { city: "Paris", description: "Waiting" },
+  ]);
 });

@@ -484,6 +484,67 @@ button:hover:not(:disabled) {
   margin-top: 20px;
 }
 
+.city-dashboard {
+  margin-top: 20px;
+}
+
+.city-dashboard.hidden {
+  display: none;
+}
+
+.dashboard-title {
+  font-size: 18px;
+  text-align: left;
+  margin-bottom: 10px;
+  color: #2d3436;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+}
+
+.dashboard-city {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.dashboard-temp {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 4px 0;
+  color: #0f172a;
+}
+
+.dashboard-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.dashboard-info img {
+  width: 24px;
+  height: 24px;
+}
+
 .weather-detail-item {
   display: flex;
   flex-direction: column;
@@ -571,6 +632,38 @@ button:hover:not(:disabled) {
   display: block;
   background: #fff1f1;
   color: #b42318;
+}
+
+body.weather-sunny {
+  background: linear-gradient(135deg, #feca57, #ff9f43);
+}
+
+body.weather-clear {
+  background: linear-gradient(135deg, #74b9ff, #cfe8ff);
+}
+
+body.weather-cloudy {
+  background: linear-gradient(135deg, #9aa7b8, #dfe7f0);
+}
+
+body.weather-rain {
+  background: linear-gradient(135deg, #2d3748, #4f46e5);
+}
+
+body.weather-storm {
+  background: linear-gradient(135deg, #1f2937, #312e81);
+}
+
+body.weather-snow {
+  background: linear-gradient(135deg, #bfdbfe, #f0f9ff);
+}
+
+body.weather-fog {
+  background: linear-gradient(135deg, #cbd5e1, #e2e8f0);
+}
+
+body.weather-cold {
+  background: linear-gradient(135deg, #60a5fa, #dbeafe);
 }
 
 #weatherResult {

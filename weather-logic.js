@@ -122,6 +122,42 @@
     };
   }
 
+  function getWeatherSceneClass(description, tempCelsius = 20) {
+    const value = (description || "").toLowerCase();
+
+    if (/(thunderstorm|storm|tornado|hurricane|cyclone)/.test(value)) {
+      return "weather-storm";
+    }
+    if (/(snow|blizzard|sleet)/.test(value)) {
+      return "weather-snow";
+    }
+    if (/(rain|drizzle|shower)/.test(value)) {
+      return "weather-rain";
+    }
+    if (/(mist|fog|haze|smoke|dust|sand|ash)/.test(value)) {
+      return "weather-fog";
+    }
+    if (/(cloud|overcast)/.test(value)) {
+      return "weather-cloudy";
+    }
+    if (Number(tempCelsius) >= 30) {
+      return "weather-sunny";
+    }
+    if (Number(tempCelsius) <= 5) {
+      return "weather-cold";
+    }
+    return "weather-clear";
+  }
+
+  function buildCityDashboardSnapshot(cities = []) {
+    return cities.filter(Boolean).map(city => ({
+      city,
+      temp: "--",
+      description: "Waiting",
+      icon: "",
+    }));
+  }
+
   function formatCityDateTime(data) {
     if (!data || typeof data.dt !== "number") {
       return { date: "N/A", time: "N/A" };
@@ -149,11 +185,13 @@
 
   const api = {
     buildAirQualityInfo,
+    buildCityDashboardSnapshot,
     buildHourlyForecastData,
     buildWeatherAlertMessage,
     buildWeatherMetrics,
     capitalizeWords,
     formatCityDateTime,
+    getWeatherSceneClass,
   };
 
   if (typeof module !== "undefined" && module.exports) {
